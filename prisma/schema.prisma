@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique @db.VarChar(100)
+  password  String    @db.VarChar(100)
+
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  userProfile UserProfile?
+  scannedProducts Scannedproduct[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(100)
+  image     String?   @db.VarChar(255)
+  height    Int       @db.SmallInt()
+  weight    Int       @db.SmallInt()
+  age       Int       @db.SmallInt()
+
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  userId    String    @unique @map("user_id")
+  user      User      @relation(fields: [userId], references: [id])
+  analysis  Analysis[]  
+
+  @@map("user_profile")
+}
+
+model Product {
+  id                Int             @id @default(autoincrement())
+  code              String          @unique @db.VarChar(20)
+  name              String          @db.VarChar(100)
+  image             String          @db.VarChar(1024)
+  category          String          @db.VarChar(100)
+  amountOfSugar     Int             @map("amount_of_sugar")
+
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  scannedProducts Scannedproduct[]
+  products Recommendation[] @relation("product") 
+  altProduct Recommendation[] @relation("altProduct")
+
+  @@map("products")
+}
+
+model Scannedproduct {
+  id            Int       @id @default(autoincrement())
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String    @map("user_id")
+  product       Product   @relation(fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productId     Int       @map("product_id")
+  sugarConsume  Int       @map("sugar_consume")
+
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  @@map("scanned_products")
+}
+
+model Recommendation {
+  product           Product   @relation("product", fields: [productId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  altProduct        Product   @relation("altProduct", fields: [altProductId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  productId         Int       @map("product_id")
+  altProductId      Int       @map("alt_product_id")
+  sugarDifference   Int       @map("sugar_difference")
+
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  @@id(name: "id", [productId, altProductId])
+  @@map("recommendations")
+}
+
+model Article {
+  id            Int       @id @default(autoincrement())
+  title         String    @db.VarChar(255)
+  description   String    @db.Text
+  image         String    @db.VarChar(255)
+  source        String    @db.VarChar(255)
+
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  @@map("articles")
+}
+
+model Analysis {
+  totalConsume     Int          @db.SmallInt() @map("total_consume")
+  userProfile      UserProfile  @relation(fields: [userId], references: [userId])
+  userId           String       @map("user_id")
+
+  date             DateTime     @default(now()) @map("consumption_date")
+
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  @@id(name: "id", [date, userId])
+  @@map("analysis")
+}
