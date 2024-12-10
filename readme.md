@@ -1,5 +1,5 @@
 # Sugaryzer Backend Service
-Backend service for Sugaryzer, sugar tracking in drinks application
+Backend service for Sugaryzer, sugar tracking in drinks application.
 
 ## Tech Stack
 - **TypeScript**: Strongly typed JavaScript for safer and more reliable code.
