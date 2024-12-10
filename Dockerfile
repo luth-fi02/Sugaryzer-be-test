@@ -4,14 +4,11 @@ FROM node:18-alpine AS build
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy the rest of the application code
+COPY . .
 
 # Install dependencies
 RUN npm install
-
-# Copy the rest of the application code
-COPY . .
 
 # Generate Prisma client
 RUN npx prisma generate
