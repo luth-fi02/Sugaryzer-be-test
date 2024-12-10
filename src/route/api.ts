@@ -23,8 +23,8 @@ apiRouter.get("/api/articles", ArticleController.getAll)
 apiRouter.get("/api/articles/:articleId(\\d+)", ArticleController.get)
 
 //Product API
-apiRouter.post("/api/products", ProductController.create);
 apiRouter.get("/api/products", ProductController.getAll);
+apiRouter.post("/api/products", ProductController.create);
 apiRouter.patch("/api/products", ProductController.update);
 apiRouter.post("/api/products/scan", fileMiddleware.single('file'), ProductController.scan);
 apiRouter.get("/api/products/:productId(\\d+)", ProductController.get);
